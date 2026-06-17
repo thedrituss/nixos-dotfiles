@@ -73,6 +73,7 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
+    curl
     foot
     kitty
     waybar
@@ -83,11 +84,22 @@
     neovim
     wl-clipboard
     ripgrep
-    fd 
+    fd
+    fzf
     nixd
     gcc
     brightnessctl
+    tree-sitter
+    nodejs
   ];
+
+
+
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    font-awesome
+  ];
+
 
   # Habilitar sonido con PipeWire
   security.rtkit.enable = true;
@@ -97,6 +109,35 @@
     alsa.support32Bit = true;
     pulse.enable = true;
   };
+
+
+# =========================================================================
+  # OPTIMIZACIÓN DE BATERÍA (TLP para Thinkpad)
+  # =========================================================================
+  services.tlp = {
+    enable = true;
+    settings = {
+      # Gobernadores de la CPU según si está enchufado o con batería
+      CPU_SCALING_GOVERNOR_ON_AC = "performance";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+
+      # Política de rendimiento de energía para procesadores AMD modernos
+      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+
+      # Escalar las frecuencias mínimas/máximas para ahorrar energía con batería
+      CPU_MIN_PERF_ON_AC = 0;
+      CPU_MAX_PERF_ON_AC = 100;
+      CPU_MIN_PERF_ON_BAT = 0;
+      CPU_MAX_PERF_ON_BAT = 60; # Limita la CPU al 60% de su potencia con batería (frío y eficiente)
+
+      # El desgaste de la batería ocurre al tenerla siempre al 100%. 
+      # Con esto, si está enchufado, solo cargará cuando baje del 40% y parará al 80%.
+      START_CHARGE_THRESH_BAT0 = 40;
+      STOP_CHARGE_THRESH_BAT0 = 80;
+    };
+  };
+
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
