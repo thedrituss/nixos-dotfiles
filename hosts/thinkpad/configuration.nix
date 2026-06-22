@@ -78,6 +78,7 @@
     kitty
     waybar
     git
+    tree
     hyprpaper
     wofi
     firefox
