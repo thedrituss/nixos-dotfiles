@@ -10,18 +10,15 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.kernelModules = [ "amdgpu" ];	
+  boot.initrd.kernelModules = [ "amdgpu" ];
 
-  # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "thinkpad"; # Define your hostname.
-  networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.hostName = "thinkpad";
+  networking.wireless.enable = true;
 
-  # Enable networking
   networking.networkmanager.enable = true;
 
-  # Set your time zone.
   time.timeZone = "Europe/Madrid";
 
   #services.getty.autologinUser = "thedrituss";
@@ -33,7 +30,6 @@
   };
 
 
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
   i18n.extraLocaleSettings = {
@@ -48,16 +44,13 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
-  # Configure keymap in X11
   services.xserver.xkb = {
     layout = "es";
     variant = "";
   };
 
-  # Configure console keymap
   console.keyMap = "es";
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."thedrituss" = {
     isNormalUser = true;
     description = "thedrituss";
@@ -65,7 +58,6 @@
     packages = with pkgs; [];
   };
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
@@ -76,6 +68,7 @@
     curl
     foot
     kitty
+    direnv
     waybar
     git
     tree
@@ -83,6 +76,9 @@
     wofi
     firefox
     neovim
+    nil
+    unzip
+    gnumake
     wl-clipboard
     ripgrep
     fd
@@ -92,6 +88,7 @@
     brightnessctl
     tree-sitter
     nodejs
+    kdePackages.okular
   ];
 
 
@@ -102,7 +99,6 @@
   ];
 
 
-  # Habilitar sonido con PipeWire
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
