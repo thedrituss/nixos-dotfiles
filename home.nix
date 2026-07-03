@@ -23,6 +23,21 @@
     nix-direnv.enable = true;
   };
 
+  programs.ssh = {
+    enable = true;
+
+    #enableDefaultConfig = false;
+
+    settings = {
+      "oracle" = {
+        HostName = "141.253.192.86";
+        User = "opc";
+        IdentityFile = "~/.ssh/oracle_cloud.key";
+        ServerAliveInterval = "60";
+      };
+    };
+  };
+
   home.file.".config/hypr".source = ./config/hypr;
   home.file.".config/waybar".source = ./config/waybar;
   home.file.".config/foot".source = ./config/foot;
@@ -38,7 +53,6 @@
     size = 16;
   };
 
-  # AÑADIDO: Instalación de la herramienta
   home.packages = with pkgs; [
     google-antigravity-cli
   ];

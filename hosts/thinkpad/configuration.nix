@@ -1,11 +1,10 @@
-
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-        ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -24,11 +23,10 @@
   #services.getty.autologinUser = "thedrituss";
 
   programs.hyprland = {
-	enable = true;
-	xwayland.enable = true;
-	withUWSM = true;
+    enable = true;
+    xwayland.enable = true;
+    withUWSM = true;
   };
-
 
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -54,8 +52,11 @@
   users.users."thedrituss" = {
     isNormalUser = true;
     description = "thedrituss";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
+    packages = with pkgs; [ ];
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -89,15 +90,13 @@
     tree-sitter
     nodejs
     kdePackages.okular
+    wireguard-tools
   ];
-
-
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     font-awesome
   ];
-
 
   security.rtkit.enable = true;
   services.pipewire = {
@@ -107,8 +106,7 @@
     pulse.enable = true;
   };
 
-
-# =========================================================================
+  # =========================================================================
   # OPTIMIZACIÓN DE BATERÍA (TLP para Thinkpad)
   # =========================================================================
   services.tlp = {
@@ -128,15 +126,25 @@
       CPU_MIN_PERF_ON_BAT = 0;
       CPU_MAX_PERF_ON_BAT = 60; # Limita la CPU al 60% de su potencia con batería (frío y eficiente)
 
-      # El desgaste de la batería ocurre al tenerla siempre al 100%. 
+      # El desgaste de la batería ocurre al tenerla siempre al 100%.
       # Con esto, si está enchufado, solo cargará cuando baje del 40% y parará al 80%.
       START_CHARGE_THRESH_BAT0 = 40;
       STOP_CHARGE_THRESH_BAT0 = 80;
     };
   };
 
+  # Configuración de WireGuard
+  networking.wg-quick.interfaces = {
+    wg0 = {
+      configFile = "/etc/wireguard/wg0.conf";
+      autostart = false;
+    };
+  };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
