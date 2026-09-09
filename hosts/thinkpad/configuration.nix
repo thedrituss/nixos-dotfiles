@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   imports = [
@@ -10,6 +15,11 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.kernelModules = [ "amdgpu" ];
+
+  # =========================================================================
+  # FIX ETHERNET: Desactiva el ahorro ASPM del driver Realtek r8169
+  # =========================================================================
+  boot.kernelParams = [ "r8169.aspm=0" ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -27,6 +37,8 @@
     xwayland.enable = true;
     withUWSM = true;
   };
+
+  services.udev.packages = [ pkgs.swayosd ];
 
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -55,14 +67,29 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "video"
+      "input"
     ];
     packages = with pkgs; [ ];
   };
 
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  # =========================================================================
+  # Configuración de Spotify con Spicetify + Adblock
+  # =========================================================================
+  programs.spicetify =
+    let
+      spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+    in
+    {
+      enable = true;
+      enabledExtensions = with spicePkgs.extensions; [
+        adblock # Bloqueador de anuncios integrado
+      ];
+    };
+
+  # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     vim
     wget
@@ -75,15 +102,20 @@
     tree
     hyprpaper
     wofi
+    swayosd
     firefox
     neovim
     nil
     unzip
     gnumake
     wl-clipboard
+    grim
+    slurp
+    satty
     ripgrep
     fd
     fzf
+    yazi
     nixd
     gcc
     brightnessctl
@@ -91,6 +123,13 @@
     nodejs
     kdePackages.okular
     wireguard-tools
+    lmms-full
+    zynaddsubfx
+    pipewire
+    pipewire.jack
+    helvum
+    sfizz-ui
+    opencode
   ];
 
   fonts.packages = with pkgs; [
@@ -104,6 +143,7 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+    jack.enable = true;
   };
 
   # =========================================================================
@@ -112,24 +152,22 @@
   services.tlp = {
     enable = true;
     settings = {
-      # Gobernadores de la CPU según si está enchufado o con batería
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-
-      # Política de rendimiento de energía para procesadores AMD modernos
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-
-      # Escalar las frecuencias mínimas/máximas para ahorrar energía con batería
       CPU_MIN_PERF_ON_AC = 0;
       CPU_MAX_PERF_ON_AC = 100;
       CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 60; # Limita la CPU al 60% de su potencia con batería (frío y eficiente)
-
-      # El desgaste de la batería ocurre al tenerla siempre al 100%.
-      # Con esto, si está enchufado, solo cargará cuando baje del 40% y parará al 80%.
+      CPU_MAX_PERF_ON_BAT = 60;
       START_CHARGE_THRESH_BAT0 = 40;
       STOP_CHARGE_THRESH_BAT0 = 80;
+
+      # --- FIX ETHERNET: Evita que TLP corte energía al bus PCIe de la tarjeta de red ---
+      PCIE_ASPM_ON_AC = "performance";
+      PCIE_ASPM_ON_BAT = "performance";
+      RUNTIME_PM_ON_AC = "on";
+      RUNTIME_PM_ON_BAT = "on";
     };
   };
 
@@ -146,31 +184,5 @@
     "flakes"
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "26.05"; # Did you read the comment?
-
+  system.stateVersion = "26.05";
 }
