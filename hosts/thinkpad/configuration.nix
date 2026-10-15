@@ -11,8 +11,17 @@
     ./hardware-configuration.nix
   ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot = {
+    enable = true;
+    extraEntries = {
+      "freebsd.conf" = ''
+        title FreeBSD 15
+        efi   /EFI/freebsd/loader.efi
+        sort-key 2
+      '';
+    };
+  };
+
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.kernelModules = [ "amdgpu" ];
 
@@ -101,7 +110,6 @@
     neovim
     nil
     unzip
-    gnumake
     wl-clipboard
     grim
     slurp
@@ -111,13 +119,25 @@
     fzf
     yazi
     nixd
-    gcc
     brightnessctl
     tree-sitter
     nodejs
     kdePackages.okular
     wireguard-tools
     pipewire
+    qutebrowser
+    tmux
+    vis
+    python315
+    xwayland-satellite
+
+    jetbrains.clion
+    cmake
+    gnumake
+    gcc
+    gdb
+    ninja
+
   ];
 
   fonts.packages = with pkgs; [

@@ -30,9 +30,9 @@
     enable = true;
     settings = {
       "oracle" = {
-        HostName = "141.253.192.86";
+        HostName = "79.72.51.211";
         User = "opc";
-        IdentityFile = "~/.ssh/oracle_cloud.key";
+        IdentityFile = "~/.ssh/oracle.key";
         ServerAliveInterval = "60";
       };
     };
@@ -50,6 +50,8 @@
   home.file.".config/nvim".source =
     config.lib.file.mkOutOfStoreSymlink "/home/thedrituss/nixos-files/config/nvim";
 
+  home.file.".config/vis".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/thedrituss/nixos-files/config/vis";
   # =========================================================================
   # TEMA DE CURSOR (Compatible con Wayland y X11/XWayland)
   # =========================================================================
@@ -58,11 +60,14 @@
     x11.enable = true;
     package = pkgs.bibata-cursors;
     name = "Bibata-Modern-Classic";
-    size = 16;
+    size = 10;
   };
 
   # Paquetes a nivel de usuario
   home.packages = with pkgs; [
+    google-antigravity
+    google-antigravity-ide
     google-antigravity-cli
   ];
+
 }
